@@ -20,13 +20,13 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 ################ Hyper-parameters
 SAVE_PATH = "./models"
 DATA_PATH = "./data/birds"
-MODEL_NAME = "birds"
+MODEL_NAME = "birds2"
 
 MODEL_INPUT_SIZE = 224
 
 NUM_EPOCHS = 150
 BATCH_SIZE = 256
-LEARNING_RATE = 0.01
+LEARNING_RATE = 0.00005
 
 VERBOSE_PERIOD = 1
 EVAL_PERIOD = 1
