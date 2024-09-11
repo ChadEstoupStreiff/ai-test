@@ -9,8 +9,8 @@ from torch.utils.data import DataLoader
 # Device configuration
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-DATA_FOLDER = "./data/birds/valid"
-MODEL_PATH = "./models/birds-121.pth"
+DATA_FOLDER = "../data/birds/valid"
+MODEL_PATH = "../models/birds-121.pth"
 MODEL_INPUT_SIZE = 224
 
 

@@ -32,8 +32,8 @@ def predict_dir(folder: str, model, map_classes: List):
                 )
 
 
-DATA_FOLDER = "./data/birds/valid"
-MODEL_PATH = "./models/birds-121.pth"
+DATA_FOLDER = "../data/birds/valid"
+MODEL_PATH = "../models/birds-121.pth"
 model_input_size = 224
 
 # Load data

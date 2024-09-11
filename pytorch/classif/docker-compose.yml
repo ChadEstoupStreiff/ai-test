@@ -1,0 +1,18 @@
+services:
+  training:
+    build:
+      context: .
+    container_name: pytorch-training
+    command: "/app/train.py"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    volumes:
+      - ./data:/data
+      - ./runs:/runs
+      - ./models:/models
+    shm_size: '16g'

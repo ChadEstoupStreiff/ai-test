@@ -18,13 +18,13 @@ logging.basicConfig(level=logging.INFO)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 ################ Hyper-parameters
-SAVE_PATH = "./models"
-DATA_PATH = "./data/birds"
+SAVE_PATH = "../models"
+DATA_PATH = "../data/birds"
 MODEL_NAME = "birds2"
 
 MODEL_INPUT_SIZE = 224
 
-NUM_EPOCHS = 150
+NUM_EPOCHS = 3000
 BATCH_SIZE = 256
 LEARNING_RATE = 0.00005
 
@@ -32,7 +32,7 @@ VERBOSE_PERIOD = 1
 EVAL_PERIOD = 1
 
 ################ Sport data loading
-writer = SummaryWriter(f"runs/{MODEL_NAME}")
+writer = SummaryWriter(f"../runs/{MODEL_NAME}")
 logging.info("Loading dataset...")
 transform = transforms.Compose(
     [
