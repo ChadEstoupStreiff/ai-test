@@ -2,43 +2,24 @@ import time
 
 from model import ConvNet, ResNet
 from torchvision import datasets, transforms
-
+from typing import Any
 import torch
 from torch.utils.data import DataLoader
 
 # Device configuration
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-DATA_FOLDER = "../data/birds/valid"
+DATA_FOLDER = "../data/birds/eval"
 MODEL_PATH = "../models/birds-121.pth"
 MODEL_INPUT_SIZE = 224
 
 
 def do_evaluation(
-    data_folder: str, model_path: str, model_input_size: int, verbose_data: bool = False, class_verbose_data: bool = True
+    model: Any, dataset: Any
 ):
     start_time = time.time()
-    # Load data
-    transform = transforms.Compose(
-        [
-            transforms.Resize((model_input_size, model_input_size)),
-            transforms.ToTensor(),
-            transforms.Normalize(
-                mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
-            ),  # Normalize with ImageNet standards
-        ]
-    )
-    dataset = datasets.ImageFolder(root=data_folder, transform=transform)
-    if verbose_data:
-        print(f"Dataset: Number of classes: {len(dataset.classes)}")
-        print(f"Dataset: Class to index mapping: \n{dataset.class_to_idx}")
 
     loader = DataLoader(dataset, batch_size=1, shuffle=True, num_workers=4)
-
-    # Loading model
-    model = ResNet(len(dataset.classes)).to(device)
-    model.load_state_dict(torch.load(model_path, weights_only=True))
-    model.eval()
 
     # Initialize counters
     class_correct = [0] * len(dataset.classes)
@@ -77,4 +58,21 @@ def do_evaluation(
 
 
 if __name__ == "__main__":
-    do_evaluation(DATA_FOLDER, MODEL_PATH, MODEL_INPUT_SIZE, verbose_data=True)
+    transform = transforms.Compose(
+        [
+            transforms.Resize((MODEL_INPUT_SIZE, MODEL_INPUT_SIZE)),
+            transforms.ToTensor(),
+            transforms.Normalize(
+                mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
+            ),  # Normalize with ImageNet standards
+        ]
+    )
+    dataset = datasets.ImageFolder(root=DATA_FOLDER, transform=transform)
+    print(f"Dataset: Number of classes: {len(dataset.classes)}")
+    print(f"Dataset: Class to index mapping: \n{dataset.class_to_idx}")
+
+    model = ResNet(len(dataset.classes)).to(device)
+    model.load_state_dict(torch.load(MODEL_PATH, weights_only=True))
+    model.eval()
+
+    do_evaluation(model, dataset)

@@ -47,11 +47,16 @@ transform = transforms.Compose(
 train_dataset = datasets.ImageFolder(
     root=os.path.join(DATA_PATH, "train"), transform=transform
 )
+eval_dataset = datasets.ImageFolder(
+    root=os.path.join(DATA_PATH, "eval"), transform=transform
+)
 test_dataset = datasets.ImageFolder(
     root=os.path.join(DATA_PATH, "test"), transform=transform
 )
 logging.info(f"Train dataset: Number of classes: {len(train_dataset.classes)}")
 logging.info(f"Train dataset: Class to index mapping: \n{train_dataset.class_to_idx}")
+logging.info(f"Eval dataset: Number of classes: {len(train_dataset.classes)}")
+logging.info(f"Eval dataset: Class to index mapping: \n{train_dataset.class_to_idx}")
 logging.info(f"Test dataset: Number of classes: {len(test_dataset.classes)}")
 logging.info(f"Test dataset: Class to index mapping: \n{test_dataset.class_to_idx}")
 
@@ -67,10 +72,10 @@ writer.add_image("mnist_images", img_grid)
 
 ################ Custom Model
 with GPUBalancerClient(importance=-1,
-    max_gpu_load=46000,
+    max_gpu_load=11000,
     title="PyTorch test",
     description="C'est Chad qui fou la merde :)",
-    host="10.10.41.2", port=9732):
+    host="10.10.41.2", port=8043):
 
     logging.info("Creating model...")
     model = ResNet(len(train_dataset.classes)).to(device)
@@ -81,6 +86,7 @@ with GPUBalancerClient(importance=-1,
     optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=10, T_mult=2)
     writer.add_graph(model, example_data.to(device))
+    writer.add_scalar("learning_rate", scheduler.get_last_lr()[0], 0)
 
     ################ Training
     logging.info("Started training...")
@@ -108,7 +114,7 @@ with GPUBalancerClient(importance=-1,
             running_correct += (predicted == labels).sum().item()
             total_samples += labels.size(0)
         scheduler.step()
-        writer.add_scalar("learning_rate", scheduler.get_last_lr()[0], epoch)
+        writer.add_scalar("learning_rate", scheduler.get_last_lr()[0], epoch+1)
 
         # Compute average loss and accuracy for the epoch
         epoch_loss = running_loss / total_samples
@@ -130,9 +136,11 @@ with GPUBalancerClient(importance=-1,
                 os.makedirs(SAVE_PATH)
             PATH = os.path.join(SAVE_PATH, f"{MODEL_NAME}-{epoch+1}.pth")
             torch.save(model.state_dict(), PATH)
+            model.eval()
             eval_accuracy = do_evaluation(
-                os.path.join(DATA_PATH, "test"), PATH, MODEL_INPUT_SIZE
+                model, eval_dataset
             )
+            model.train()
             writer.add_scalar("eval_accuracy", eval_accuracy, epoch)
 
     logging.info("Finished Training. Saving model...")
