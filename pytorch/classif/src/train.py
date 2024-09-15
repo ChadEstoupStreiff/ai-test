@@ -20,7 +20,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 ################ Hyper-parameters
 SAVE_PATH = "../models"
 DATA_PATH = "../data/birds"
-MODEL_NAME = "birds2"
+MODEL_NAME = "birds3"
 
 MODEL_INPUT_SIZE = 224
 
@@ -34,6 +34,20 @@ EVAL_PERIOD = 1
 ################ Sport data loading
 writer = SummaryWriter(f"../runs/{MODEL_NAME}")
 logging.info("Loading dataset...")
+training_transform = transforms.Compose(
+    [
+        transforms.Resize((MODEL_INPUT_SIZE, MODEL_INPUT_SIZE)),
+        transforms.RandomResizedCrop(size=224, scale=(0.8, 1.0)),
+        transforms.RandomHorizontalFlip(),
+        transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1),
+        transforms.RandomRotation(10),
+        transforms.RandomPerspective(distortion_scale=0.2, p=0.5),
+        transforms.ToTensor(),
+        transforms.Normalize(
+            mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
+        ),  # Normalize with ImageNet standards
+    ]
+)
 transform = transforms.Compose(
     [
         transforms.Resize((MODEL_INPUT_SIZE, MODEL_INPUT_SIZE)),
@@ -45,7 +59,7 @@ transform = transforms.Compose(
 )
 
 train_dataset = datasets.ImageFolder(
-    root=os.path.join(DATA_PATH, "train"), transform=transform
+    root=os.path.join(DATA_PATH, "train"), transform=training_transform
 )
 eval_dataset = datasets.ImageFolder(
     root=os.path.join(DATA_PATH, "eval"), transform=transform
