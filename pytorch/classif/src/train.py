@@ -11,6 +11,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
+from torchsummary import summary
 import logging
 
 # Device configuration
@@ -93,6 +94,7 @@ with GPUBalancerClient(importance=-1,
 
     logging.info("Creating model...")
     model = ResNet(len(train_dataset.classes)).to(device)
+    summary(model, (3, MODEL_INPUT_SIZE, MODEL_INPUT_SIZE))
 
     ################ Loss & Optimizer
 

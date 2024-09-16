@@ -46,6 +46,7 @@ class ConvNet(nn.Module):
         self.fc1 = nn.Linear(128 * 14 * 14, 1024)
         self.fc2 = nn.Linear(1024, nbr_classes)
 
+
     def forward(self, x):
         x = F.relu(self.bn1(self.conv1_2(self.conv1_1(x))))
         x = F.relu(self.bn2(self.conv2_2(self.conv2_1(x))))
