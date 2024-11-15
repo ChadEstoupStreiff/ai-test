@@ -1,0 +1,14 @@
+
+
+
+torch==2.4.1
+torchsummary==1.5.1
+torchvision==0.19.1
+torchaudio==2.4.1
+# tensorboard==2.17.1
+tqdm==4.66.5
+keras==3.6.0
+keras-hub==0.17.0
+keras-cv==0.9.0
+matplotlib
+pycocotools
